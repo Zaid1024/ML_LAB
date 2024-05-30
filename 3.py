@@ -4,9 +4,7 @@ import seaborn as sns
 
 # Generate synthetic n-dimensional data
 np.random.seed(42)
-n_samples = 10
-n_features = 10
-data_nd = np.random.rand(n_samples, n_features)
+data_nd = np.random.rand(10,10)
 
 # For demonstration, let's assume we want to visualize this data directly as a heatmap
 plt.figure(figsize=(8, 6))
