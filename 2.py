@@ -1,4 +1,6 @@
-# Generate random 3D data
+import numpy as np
+import matplotlib.pyplot as plt
+
 x = np.linspace(-3, 3, 100)
 y = np.linspace(-3, 3, 100)
 X, Y = np.meshgrid(x, y)
@@ -10,8 +12,7 @@ plt.contour(X, Y, Z, cmap='viridis')
 plt.title('Contour Plot of 3D Data')
 plt.xlabel('X')
 plt.ylabel('Y')
-plt.show()
------------------------------------------
+plt.show()------------------------------
 
 def h(n):
     H = {'A': 3, 'B': 4, 'C': 2, 'D': 6, 'G': 0, 'S': 5}
