@@ -10,45 +10,51 @@ ax.set_ylabel('Y')
 ax.set_zlabel('Z')
 plt.show()
 -----------------------------------------
+def best_first_search(graph,start,goal,heuristic, path=[]):
+    open_list = [(0,start)]
+    closed_list = set()
+    closed_list.add(start)
 
-from collections import defaultdict
+    while open_list:
+        open_list.sort(key = lambda x: heuristic[x[1]], reverse=True)
+        cost, node = open_list.pop()
+        path.append(node)
 
-def bfs(graph, start, goal):
-    visited = set()
-    queue = [(start, [start])]
-    
-    while queue:
-        node, path = queue.pop(0)
-        visited.add(node)
-        
-        if node == goal:
-            return path
-        
-        for neighbor in graph[node]:
-            if neighbor not in visited:
-                queue.append((neighbor, path + [neighbor]))
-                visited.add(neighbor)
-    
+        if node==goal:
+            return cost, path
+
+        closed_list.add(node)
+        for neighbour, neighbour_cost in graph[node]:
+            if neighbour not in closed_list:
+                closed_list.add(node)
+                open_list.append((cost+neighbour_cost, neighbour))
+
     return None
 
-# Function to create a graph from user input
-def create_graph():
-    graph = defaultdict(list)
-    while True:
-        node = input("Enter node (or 'done' to finish): ").strip()
-        if node.lower() == 'done':
-            break
-        neighbors = input("Enter neighbors of {} separated by space: ".format(node)).split()
-        graph[node] = neighbors
-    return graph
 
-# Example usage
-graph = create_graph()
-start_node = input("Enter start node: ").strip()
-goal_node = input("Enter goal node: ").strip()
+graph = {
+    'A': [('B', 20), ('C', 15), ('D',16)],
+    'B': [('A', 20)],
+    'C': [('A', 15), ('E', 12)],
+    'D': [('A', 16), ('E', )],
+    'E': []
+}
 
-path = bfs(graph, start_node, goal_node)
-if path:
-    print("Path found:", path)
+start = 'A'
+goal = 'E'
+
+heuristic = {
+    'A': 25,
+    'B': 20,
+    'C': 12,
+    'D': 13,
+    'E': 0
+}
+
+result = best_first_search(graph, start, goal, heuristic)
+
+if result:
+    print(f"Minimum cost path from {start} to {goal} is {result[1]}")
+    print(f"Cost: {result[0]}")
 else:
-    print("Path not found")
+    print(f"No path from {start} to {goal}")
