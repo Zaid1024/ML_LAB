@@ -12,6 +12,7 @@ class NaiveBayesClassifier:
         self.classes = np.unique(y)
         for c in self.classes:
             self.prior[c] = np.mean(y == c)
+
         for feature in X.columns:
             self.conditional[feature] = {}
             for c in self.classes:
@@ -21,12 +22,14 @@ class NaiveBayesClassifier:
     def predict(self, X):
         y_pred = []
         for _, sample in X.iterrows():
-            probabilities = {c: self.prior[c] for c in self.classes}
+            probabilities = {}
             for c in self.classes:
+                probabilities[c] = self.prior[c]
                 for feature in X.columns:
                     mean = self.conditional[feature][c]['mean']
                     std = self.conditional[feature][c]['std']
-                    probabilities[c] *= self._gaussian_pdf(sample[feature], mean, std)
+                    x = sample[feature]
+                    probabilities[c] *= self._gaussian_pdf(x, mean, std)
             y_pred.append(max(probabilities, key=probabilities.get))
         return y_pred
 
@@ -34,25 +37,34 @@ class NaiveBayesClassifier:
         exponent = np.exp(-((x - mean) ** 2) / (2 * std ** 2))
         return (1 / (np.sqrt(2 * np.pi) * std)) * exponent
 
-# Load and preprocess data
+# Load dataset
 df = pd.read_csv('./dm/titanic.csv')
 df = df[['Survived', 'Pclass', 'Age', 'SibSp', 'Parch', 'Fare', 'Embarked']]
-df['Age'].fillna(df['Age'].median(), inplace=True)
-df['Fare'].fillna(df['Fare'].median(), inplace=True)
-df['Embarked'].fillna(df['Embarked'].mode()[0], inplace=True)
+
+# Fill missing values
+df['Age'] = df['Age'].fillna(df['Age'].median())
+df['Fare'] = df['Fare'].fillna(df['Fare'].median())
+df.fillna({'Embarked': df['Embarked'].mode()[0]}, inplace=True)
+
+# Map categorical 'Embarked' column to numerical values
 df['Embarked'] = df['Embarked'].map({'C': 0, 'Q': 1, 'S': 2})
 
-# Split data
+# Split dataset into training and testing sets
 train, test = train_test_split(df, test_size=0.2)
-X_train, y_train = train.drop('Survived', axis=1), train['Survived']
-X_test, y_test = test.drop('Survived', axis=1), test['Survived']
 
-# Train and evaluate model
+X_train = train.drop('Survived', axis=1)
+y_train = train['Survived']
+X_test = test.drop('Survived', axis=1)
+y_test = test['Survived']
+
+# Train Naive Bayes Classifier
 classifier = NaiveBayesClassifier()
 classifier.fit(X_train, y_train)
+
+# Predict and evaluate the model
 y_pred = classifier.predict(X_test)
 
-# Display results
 cm = confusion_matrix(y_test, y_pred)
 print("Confusion Matrix:\n", cm)
-print("Accuracy:", np.mean(y_pred == y_test))
+accuracy = np.mean(y_pred == y_test)
+print("Accuracy:", accuracy)
