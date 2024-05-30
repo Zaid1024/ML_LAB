@@ -1,13 +1,15 @@
-from mpl_toolkits.mplot3d import Axes3D
+# Generate random 3D data
+x = np.linspace(-3, 3, 100)
+y = np.linspace(-3, 3, 100)
+X, Y = np.meshgrid(x, y)
+Z = np.sin(np.sqrt(X**2 + Y**2))
 
-# 3D surface plot
-fig = plt.figure(figsize=(10, 8))
-ax = fig.add_subplot(111, projection='3d')
-ax.plot_surface(X, Y, Z, cmap='viridis')
-ax.set_title('3D Surface Plot of 3D Data')
-ax.set_xlabel('X')
-ax.set_ylabel('Y')
-ax.set_zlabel('Z')
+# Contour plot
+plt.figure(figsize=(8, 6))
+plt.contour(X, Y, Z, cmap='viridis')
+plt.title('Contour Plot of 3D Data')
+plt.xlabel('X')
+plt.ylabel('Y')
 plt.show()
 -----------------------------------------
 
